@@ -1,4 +1,4 @@
-# Spark 
+# Spark Deployment in Openshift
 
 Master, specifying the master port in environment
 ```

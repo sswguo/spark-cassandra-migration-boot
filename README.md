@@ -11,6 +11,8 @@ To complete this, you need:
 - Openshift 4
 - JDK 11+
 
+# Build Spark Images
+
 Build spark master and worker, for details of spark, ref the [doc](spark/README.md)
 ```
 docker build -t quay.io/sswguo/spark-master:3.4.0-jdk11-1.2 .
@@ -20,6 +22,8 @@ docker build -t quay.io/sswguo/spark-worker:3.4.0-jdk11-1.2 .
 docker push quay.io/sswguo/spark-worker:3.4.0-jdk11-1.2
 ```
 
+# Deploy Spark (Master & Worker) into Openshift
+
 Deploy spark
 ```
 oc apply -f spark-master-deployment.yaml
@@ -28,10 +32,12 @@ oc apply -f spark-worker-persistent-volume-claim.yaml
 oc apply -f spark-worker-deployment.yaml 
 ```
 
+# Build the migration application
 Build the migration application
 ```
 mvn clean package
 ```
+# Running the migration
 
 Sync the jar into spark worker
 ```
