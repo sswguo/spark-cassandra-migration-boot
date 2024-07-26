@@ -1,0 +1,45 @@
+
+
+spark-shell --master spark://spark-master:7077 \
+            --conf spark.cassandra.connection.host=cassandra-cluster \
+            --conf spark.cassandra.connection.port=9042 \
+            --conf spark.cassandra.auth.username=cassandra \
+            --conf spark.cassandra.auth.password=cassandra
+
+spark-shell --master spark://spark-master:7077 \
+            --packages com.datastax.spark:spark-cassandra-connector_2.12:3.4.0 \
+            --conf spark.cassandra.connection.host=cassandra-cluster \
+            --conf spark.cassandra.connection.port=9042 \
+            --conf spark.cassandra.auth.username=cassandra \
+            --conf spark.cassandra.auth.password=cassandra
+
+
+import org.apache.spark.sql.SparkSession
+
+val spark = SparkSession.builder()
+    .appName("CassandraConnectionTest1")
+    .config("spark.cassandra.connection.host", "cassandra-cluster")
+    .config("spark.cassandra.connection.port", "9042")
+    .config("spark.cassandra.auth.username", "cassandra")
+    .config("spark.cassandra.auth.password", "cassandra")
+    .getOrCreate()
+
+// Replace 'your_keyspace' and 'your_table' with your actual keyspace and table names
+val df = spark.read
+    .format("org.apache.spark.sql.cassandra")
+    .options(Map("keyspace" -> "indystorage", "table" -> "pathmap"))
+    .load()
+
+// Show the first 10 rows of the table
+df.show(10)
+
+
+./bin/spark-submit \
+  --class org.commonjava.migration.App \
+  --master spark://spark-master:7077 \
+  /tmp/migration-1.0-SNAPSHOT.jar \
+
+
+spark-shell --conf spark.cassandra.connection.host=cassandra-cluster \
+                            --packages com.datastax.spark:spark-cassandra-connector_2.12:3.5.1
+                            --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: spark
+  name: vol-migration-data
+  annotations:
+    kubernetes.io/reclaimPolicy: "Delete"
+    trident.netapp.io/reclaimPolicy: "Delete"
+spec:
+  storageClassName: "dynamic-nfs"
+  accessModes: [ "ReadWriteMany" ]
+  resources:
+    requests:
+      storage: "20Gi"
