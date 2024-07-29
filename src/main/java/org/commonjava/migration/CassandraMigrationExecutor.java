@@ -14,7 +14,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 
-public class CassandraMigrationExcutor
+public class CassandraMigrationExecutor
 {
 
     //https://github.com/datastax/spark-cassandra-connector/blob/master/doc/7_java_api.md

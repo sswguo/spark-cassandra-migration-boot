@@ -12,10 +12,10 @@ public class App
 
         logger.info("Hello, Migration!");
 
-        CassandraMigrationExcutor excutor = new CassandraMigrationExcutor();
+        CassandraMigrationExecutor executor = new CassandraMigrationExecutor();
         try
         {
-            excutor.export();
+            executor.export();
         }
         catch (Exception e)
         {
