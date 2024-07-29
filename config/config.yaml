@@ -1,0 +1,10 @@
+host: cassandra-cluster
+port: 9042
+user: cassandra
+password: cassandra
+tables:
+  - keyspace: indystorage
+    table: pathmap
+    tempView: pathmap
+    filter: "creation > '2023-08-08'"
+    id: pathmap_dev

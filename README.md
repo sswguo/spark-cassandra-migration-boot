@@ -38,6 +38,7 @@ oc apply -f spark-worker-deployment.yaml
 _NOTE_: Request the suitable storage based on your business, the default size here is `5Gi`. And resources for workers.
 
 # Build the migration application
+
 Build the migration application, confirm the migration app is in read mode
 ```
 mvn clean package
@@ -49,6 +50,8 @@ Sync the jar into spark worker
 cp target/migration-1.0-SNAPSHOT.jar app
 oc rsync app/ <spark-worker POD_NAME>:/tmp/
 ```
+
+Configure the setting for cassandra in `/opt/spark/conf/config.yaml`
 
 Submit the job in worker node
 ```

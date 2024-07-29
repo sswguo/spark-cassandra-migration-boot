@@ -15,7 +15,7 @@ public class App
         CassandraMigrationExcutor excutor = new CassandraMigrationExcutor();
         try
         {
-            excutor.run();
+            excutor.export();
         }
         catch (Exception e)
         {
