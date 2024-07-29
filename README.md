@@ -53,6 +53,23 @@ oc rsync app/ <spark-worker POD_NAME>:/tmp/
 
 Configure the setting for cassandra in `/opt/spark/conf/config.yaml`
 
+```
+host: cassandra-cluster
+port: 9042
+user: cassandra
+password: cassandra
+tables:
+  - keyspace: <KEYSPACE>
+    table: <TABLE>
+    tempView: <View>
+    filter: "creation > '2023-08-08'"
+    id: <ID>
+```
+
+`tempView`: Custom name of the table
+`filter`: If you want to do migration separately, especially the data is large
+`id`: The identities of the directory which stores the CSV files
+
 Submit the job in worker node
 ```
 spark-submit \
