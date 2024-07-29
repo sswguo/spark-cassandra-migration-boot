@@ -77,4 +77,57 @@ public class CassandraMigrationExcutor
 
     }
 
+    public void save() throws Exception
+    {
+        logger.info("Start ....");
+
+        SparkSession spark = null;
+        try
+        {
+            spark = SparkSession.builder()
+                    .appName("CassandraMigration-v1.1")
+                    .master("spark://spark-master:7077")
+                    .config("spark.cassandra.connection.host", "cassandra-cluster")
+                    .config("spark.cassandra.connection.port", "9042") // Default port, adjust if necessary
+                    .config("spark.cassandra.auth.username", "cassandra")
+                    .config("spark.cassandra.auth.password", "cassandra")
+                    //.config("spark.cassandra.output.consistency.level", "")
+                    .config("spark.driver.memory", "1g") // Adjust based on your needs
+                    .config("spark.executor.memory", "1g") // Adjust based on your needs
+                    .config("spark.executor.cores", "1") // Adjust based on your needs
+                    .config("spark.driver.extraJavaOptions", "--illegal-access=permit")
+                    .config("spark.executor.extraJavaOptions", "--illegal-access=permit")
+                    .config("spark.authenticate", "false")
+                    .getOrCreate();
+        }
+        catch (Exception e)
+        {
+            logger.error("Create spark session failed.", e);
+            e.printStackTrace();
+            return;
+        }
+
+        logger.info("Spark session created successfully");
+
+        Thread.sleep(30000);
+
+        // Load all CSV files from the directory into a DataFrame
+        Dataset<Row> df = spark.read()
+                .format("csv")
+                .option("header", "true") // Use first line of CSV file as header
+                .option("inferSchema", "true") // Automatically infer data types
+                .load("/opt/spark/storage/indy_pathmap_0729/*");
+
+        // Write the DataFrame to Cassandra
+        df.write()
+                .format("org.apache.spark.sql.cassandra")
+                .option("keyspace", "indystorage")
+                .option("table", "pathmap")
+                .mode("append")
+                .save();
+
+        // Stop the Spark session
+        spark.stop();
+    }
+
 }
