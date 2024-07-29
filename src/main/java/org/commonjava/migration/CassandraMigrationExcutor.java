@@ -16,8 +16,7 @@ public class CassandraMigrationExcutor
 
     public void run() throws Exception {
 
-     //   https:
-//spark.apache.org/docs/3.4.0/sql-getting-started.html
+     //   https://spark.apache.org/docs/3.4.0/sql-getting-started.html
 
         logger.info("Start ....");
         // https://github.com/datastax/spark-cassandra-connector/blob/master/doc/reference.md
@@ -28,7 +27,7 @@ public class CassandraMigrationExcutor
         try
         {
             spark = SparkSession.builder()
-                    .appName("CassandraDataMigration-v1.0")
+                    .appName("CassandraMigration-v1.0")
                     .master("spark://spark-master:7077")
                     .config("spark.cassandra.connection.host", "cassandra-cluster")
                     .config("spark.cassandra.connection.port", "9042") // Default port, adjust if necessary
@@ -52,7 +51,7 @@ public class CassandraMigrationExcutor
 
         logger.info("Spark session created successfully");
 
-        Thread.sleep(60000);
+        Thread.sleep(30000);
 
         // Reading from a Cassandra table
         Dataset<Row> df = spark.read()
@@ -63,17 +62,15 @@ public class CassandraMigrationExcutor
                 //.filter("some_column > some_value")
                 //.select("relevant_column1", "relevant_column2");
 
-        //df.show(); // For demonstration purposes
-
         df.createOrReplaceTempView("pathmap");
-        Dataset<Row> sqlDF = spark.sql("SELECT * FROM pathmap");
-        sqlDF.show();
+        Dataset<Row> sqlDF = spark.sql("SELECT * FROM pathmap where creation > '2023-08-08'");
+        //sqlDF.show();
 
-        DataFrameWriter dataFrameWriter = df.write();
+        DataFrameWriter dataFrameWriter = sqlDF.write();
 
-        logger.info("write dataset to csv file ....");
+        logger.info("Write dataset to csv file ....");
         String storageDir = "/opt/spark/storage/indy_pathmap_" + System.currentTimeMillis();
-        dataFrameWriter.csv(storageDir);
+        dataFrameWriter.option("header", true).csv(storageDir);
 
         // Stop the Spark session
         spark.stop();
