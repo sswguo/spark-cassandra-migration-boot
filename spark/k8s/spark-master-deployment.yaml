@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: spark-master
-          image: quay.io/sswguo/spark-master:3.4.0.3
+          image: quay.io/sswguo/spark-master:3.4.0-jdk11-1.5
           ports:
             - containerPort: 7077
             - containerPort: 8080

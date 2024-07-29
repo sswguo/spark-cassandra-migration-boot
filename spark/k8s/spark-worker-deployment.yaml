@@ -6,7 +6,7 @@ metadata:
     app: spark
     component: worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: spark
@@ -25,6 +25,13 @@ spec:
               value: "spark://spark-master:7077"
           ports:
             - containerPort: 8081
+          resources:
+            limits:
+              cpu: 2
+              memory: 2000Mi
+            requests:
+              cpu: 300m
+              memory: 400Mi
           volumeMounts:
             - name: vol-migration-data
               mountPath: /opt/spark/storage
@@ -32,14 +39,5 @@ spec:
         - name: vol-migration-data
           persistentVolumeClaim:
             claimName: vol-migration-data
-  volumeClaimTemplates:
-    - metadata:
-        name: "vol-migration-data"
-      spec:
-        accessModes: [ "ReadWriteMany" ]
-        resources:
-          requests:
-            storage: "20Gi"
-        storageClassName: "dynamic-nfs"
 
 

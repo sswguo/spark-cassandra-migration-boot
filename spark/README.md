@@ -15,6 +15,17 @@ env:
 ```
 _NOTE_: For PVC, update the `storageClassName` according to your cluster
 
+And please specify your resources based on your business, otherwise it will be killed due to lack of enough resources
+```
+resources:
+  limits:
+    cpu: 2
+    memory: 2000Mi
+  requests:
+    cpu: 300m
+    memory: 400Mi
+```
+
 Logs
 ```
 > oc rsh <POD_NAME>

@@ -26,11 +26,16 @@ docker push quay.io/sswguo/spark-worker:3.4.0-jdk11-1.2
 
 Deploy spark
 ```
+oc login --token=<TOKEN> --server=<CLUSTER>
+
 oc apply -f spark-master-deployment.yaml
 oc apply -f spark-master-service.yaml
+
 oc apply -f spark-worker-persistent-volume-claim.yaml
 oc apply -f spark-worker-deployment.yaml 
 ```
+
+_NOTE_: Request the suitable storage based on your business, the default size here is `5Gi`.
 
 # Build the migration application
 Build the migration application
