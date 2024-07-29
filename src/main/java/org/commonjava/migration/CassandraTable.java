@@ -1,6 +1,6 @@
 package org.commonjava.migration;
 
-public class Table
+public class CassandraTable
 {
 
     private String keyspace;

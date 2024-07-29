@@ -9,7 +9,7 @@ public class CassandraConfig
     private String port;
     private String user;
     private String password;
-    private List<Table> tables;
+    private List<CassandraTable> tables;
 
     public String getHost() {
         return host;
@@ -43,11 +43,11 @@ public class CassandraConfig
         this.password = password;
     }
 
-    public List<Table> getTables() {
+    public List<CassandraTable> getTables() {
         return tables;
     }
 
-    public void setTables(List<Table> tables) {
+    public void setTables(List<CassandraTable> tables) {
         this.tables = tables;
     }
 

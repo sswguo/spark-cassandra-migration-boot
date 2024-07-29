@@ -75,7 +75,7 @@ public class CassandraMigrationExcutor
 
         Thread.sleep(30000);
 
-        for ( Table table : config.getTables() )
+        for ( CassandraTable table : config.getTables() )
         {
             // Reading from a Cassandra table
             Dataset<Row> df = spark.read()
@@ -114,7 +114,7 @@ public class CassandraMigrationExcutor
 
         Thread.sleep(30000);
 
-        for ( Table table : config.getTables() )
+        for ( CassandraTable table : config.getTables() )
         {
 
             // Load all CSV files from the directory into a DataFrame

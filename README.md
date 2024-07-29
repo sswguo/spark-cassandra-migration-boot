@@ -66,9 +66,9 @@ tables:
     id: <ID>
 ```
 
-`tempView`: Custom name of the table 
-`filter`: If you want to do migration separately, especially the data is large 
-`id`: The identities of the directory which stores the CSV files 
+`tempView`: Custom name of the table  
+`filter`: If you want to do migration separately, especially the data is large  
+`id`: The identities of the directory which stores the CSV files  
 
 Submit the job in worker node
 ```
