@@ -90,6 +90,25 @@ Or the filters when loading the data
 .select("relevant_column1", "relevant_column2");
 ```
 
+Another point, we can increase the resources (cpu & mem) to speed up the process
+- worker resource
+```
+- resources:
+    limits:
+      cpu: '4'
+      memory: 8Gi
+    requests:
+      cpu: 300m
+      memory: 400Mi
+```
+- executor resource
+```
+.config("spark.executor.memory", "6g")
+.config("spark.executor.cores", "3")
+```
+
+_NOTE_: executor with cores `3` will run the 3 tasks in parallel 
+
 # Running the migration - write
 
 ```

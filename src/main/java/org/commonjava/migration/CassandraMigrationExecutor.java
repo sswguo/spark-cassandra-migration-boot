@@ -43,9 +43,10 @@ public class CassandraMigrationExecutor
                     .config("spark.cassandra.auth.username", config.getUser())
                     .config("spark.cassandra.auth.password", config.getPassword())
                     .config("spark.cassandra.output.consistency.level", "QUORUM")
+                    .config("spark.cassandra.input.consistency.level", "QUORUM")
                     .config("spark.driver.memory", "1g") // Adjust based on your needs
-                    .config("spark.executor.memory", "1g") // Adjust based on your needs
-                    .config("spark.executor.cores", "1") // Adjust based on your needs
+                    .config("spark.executor.memory", "6g") // Adjust based on your needs
+                    .config("spark.executor.cores", "3") // Adjust based on your needs
                     .config("spark.driver.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.executor.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.authenticate", "false")
