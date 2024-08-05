@@ -92,12 +92,19 @@ public class CassandraMigrationExecutor
 
             if ( !config.getSharedStorage() )
             {
-                // ========= write data to csv files ===========
+                // ========= write data to local storage ===========
                 DataFrameWriter dataFrameWriter = sqlDF.write();
 
                 logger.info("Write dataset to csv file ....");
                 String storageDir = "/opt/spark/storage/" + table.getId() + "_" + System.currentTimeMillis();
-                dataFrameWriter.option("header", true).csv(storageDir);
+                if ( config.getFileFormat().equalsIgnoreCase("csv") )
+                {
+                    dataFrameWriter.option("header", true).csv(storageDir);
+                }
+                else
+                {
+                    dataFrameWriter.option("header", true).parquet(storageDir);
+                }
                 // ========= write data to csv files ===========
             }
             else
@@ -149,14 +156,25 @@ public class CassandraMigrationExecutor
             Dataset<Row> df = null;
             if ( !config.getSharedStorage() )
             {
-                // ========= load data from csv files ===========
+                // ========= load data from local storage ===========
                 // Load all CSV files from the directory into a DataFrame
-                df = spark.read()
-                    .format("csv")
-                    .option("header", "true") // Use first line of CSV file as header
-                    .option("inferSchema", "true") // Automatically infer data types
-                    .load("/opt/spark/storage/" + table.getId() + "/*");
-                // ========= load data from csv files ===========
+                if ( config.getFileFormat().equalsIgnoreCase("csv") )
+                {
+                    df = spark.read()
+                            .format("csv")
+                            .option("header", "true") // Use first line of CSV file as header
+                            .option("inferSchema", "true") // Automatically infer data types
+                            .load("/opt/spark/storage/" + table.getId() + "/*");
+                }
+                else
+                {
+                    df = spark.read()
+                            .format("parquet")
+                            .option("header", "true") // Use first line of CSV file as header
+                            .option("inferSchema", "true") // Automatically infer data types
+                            .load("/opt/spark/storage/" + table.getId() + "/*");
+                }
+                // ========= load data from local storage ===========
             }
             else {
                 // ========= load data from S3 ===========
