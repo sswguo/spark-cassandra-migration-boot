@@ -10,6 +10,7 @@ To complete this, you need:
 - Cassandra 3.11.X
 - Openshift 4
 - JDK 11+
+- S3 instance( if you want to use shared storage )
 
 # Build Spark Images
 
