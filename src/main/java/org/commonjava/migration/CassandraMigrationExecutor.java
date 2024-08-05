@@ -107,11 +107,22 @@ public class CassandraMigrationExecutor
 
                 // Write DataFrame to S3 as CSV files in a directory
                 String bucketPath = "s3a://" + config.getBucketName() + "/indy_migration_test/" + table.getKeyspace() + "/" + table.getTable() + "/";
-                sqlDF.write()
+
+                if ( config.getFileFormat().equalsIgnoreCase("csv") ) {
+                    //CSV
+                    sqlDF.write()
                         .format("csv")
                         .option("header", "true")
                         .mode("overwrite") // Overwrite if the directory exists
                         .save(bucketPath);
+                }
+                else
+                {
+                    sqlDF.write()
+                            .option("header", "true")
+                            .mode("overwrite") // Overwrite if the directory exists
+                            .parquet(bucketPath);
+                }
                 // ========= write data to S3 ===========
             }
         }
@@ -154,11 +165,19 @@ public class CassandraMigrationExecutor
 
                 // Read data from S3 into DataFrame
                 String bucketPath = "s3a://" + config.getBucketName() + "/indy_migration_test/" + table.getKeyspace() + "/" + table.getTable() + "/";
-                df = spark.read()
+
+                if ( config.getFileFormat().equalsIgnoreCase("csv") )
+                {
+                    df = spark.read()
                         .format("csv")
                         .option("header", "true")
                         .option("inferSchema", "true")
                         .load(bucketPath);
+                }
+                else
+                {
+                    df = spark.read().parquet(bucketPath);
+                }
                 // ========= load data from S3 ===========
                 //df.show();
             }

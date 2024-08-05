@@ -9,6 +9,7 @@ tables:
     filter: "creation > '2023-08-08'"
     id: pathmap_dev
 sharedStorage: true
+fileFormat: parquet
 awsAccessKeyID:
 awsSecretAccessKey:
 bucketRegion:

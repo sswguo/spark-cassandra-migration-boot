@@ -21,6 +21,8 @@ public class MigrationConfig
 
     private Boolean sharedStorage;
 
+    private String fileFormat;
+
     public String getHost() {
         return host;
     }
@@ -99,6 +101,14 @@ public class MigrationConfig
 
     public void setSharedStorage(Boolean sharedStorage) {
         this.sharedStorage = sharedStorage;
+    }
+
+    public String getFileFormat() {
+        return fileFormat == null ? "Parquet" : fileFormat;
+    }
+
+    public void setFileFormat(String fileFormat) {
+        this.fileFormat = fileFormat;
     }
 
     @Override
