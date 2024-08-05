@@ -81,6 +81,8 @@ spark-submit \
 
 # Optimize 
 
+## Filters
+
 If you have large data in prod, try to use filters to do the migration, for example we can try to use date to split the data
 ```
 Dataset<Row> sqlDF = spark.sql("SELECT * FROM <tablename> where <date_column> > '2023-08-08'");
@@ -91,6 +93,7 @@ Or the filters when loading the data
 .select("relevant_column1", "relevant_column2");
 ```
 
+## Resources
 Another point, we can increase the resources (cpu & mem) to speed up the process
 - worker resource
 ```
@@ -109,6 +112,13 @@ Another point, we can increase the resources (cpu & mem) to speed up the process
 ```
 
 _NOTE_: executor with cores `3` will run the 3 tasks in parallel 
+
+## File Format
+
+This application supports two file formats, parquet and CSV
+
+Parquet is designed to be highly efficient for both reading and writing large datasets.
+[link](https://aemreusta.medium.com/parquet-vs-csv-a-comparison-of-file-formats-for-data-storage-with-experiment-bb0a4d7263ed)
 
 # Running the migration - write
 
