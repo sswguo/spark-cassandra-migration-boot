@@ -116,3 +116,22 @@ oc rsync stage_pathmap_migration/ <spark-worker POD_NAME>:/opt/spark/storage/ind
 ```
 
 Update the migration app to write mode, and then sync the jar into spark worker, submit the job in worker node as above.
+
+# Shared Storage - AWS S3
+
+If you have shared storage, you will not need to transfer the csv files between Openshift cluster, you just need to configure the info of S3
+
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+BUCKET_REGION
+BUCKET_NAME
+```
+
+You can use the following tool aws cli to check the files in S3, and remove them after migration.
+
+```
+aws s3 ls s3://<BUCKET_NAME>/indy_migration_test/indystorage/pathmap/
+
+aws s3 rm s3://<BUCKET_NAME>/indy_migration_test/ --recursive
+```

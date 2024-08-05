@@ -20,17 +20,16 @@ public class CassandraMigrationExecutor
     //https://github.com/datastax/spark-cassandra-connector/blob/master/doc/7_java_api.md
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-
-    public CassandraConfig loadConfig() throws Exception
+    public MigrationConfig loadConfig() throws Exception
     {
-        Yaml yaml = new Yaml(new Constructor(CassandraConfig.class, new LoaderOptions()));
+        Yaml yaml = new Yaml(new Constructor(MigrationConfig.class, new LoaderOptions()));
         InputStream inputStream = new FileInputStream("/opt/spark/conf/config.yaml");
-        CassandraConfig config = yaml.load(inputStream);
+        MigrationConfig config = yaml.load(inputStream);
         logger.info("Cassandra config: {}", config);
         return config;
     }
 
-    private SparkSession initSessions( CassandraConfig config ) throws Exception
+    private SparkSession initSessions( MigrationConfig config ) throws Exception
     {
         SparkSession spark = null;
         try
@@ -68,7 +67,7 @@ public class CassandraMigrationExecutor
         // Step 1: Create Spark session
        // https://spark.apache.org/docs/3.4.0/sql-getting-started.html#running-sql-queries-programmatically
 
-        CassandraConfig config = loadConfig();
+        MigrationConfig config = loadConfig();
 
         SparkSession spark = initSessions( config );
 
@@ -91,11 +90,30 @@ public class CassandraMigrationExecutor
             Dataset<Row> sqlDF = spark.sql("SELECT * FROM " + table.getTempView() + ( table.getFilter() != null ? " where " + table.getFilter() : ""));
             //sqlDF.show();
 
-            DataFrameWriter dataFrameWriter = sqlDF.write();
+            if ( !config.getSharedStorage() )
+            {
+                // ========= write data to csv files ===========
+                DataFrameWriter dataFrameWriter = sqlDF.write();
 
-            logger.info("Write dataset to csv file ....");
-            String storageDir = "/opt/spark/storage/" + table.getId() + "_" + System.currentTimeMillis();
-            dataFrameWriter.option("header", true).csv(storageDir);
+                logger.info("Write dataset to csv file ....");
+                String storageDir = "/opt/spark/storage/" + table.getId() + "_" + System.currentTimeMillis();
+                dataFrameWriter.option("header", true).csv(storageDir);
+                // ========= write data to csv files ===========
+            }
+            else
+            {
+                // ========= write data to S3 ===========
+                configureAWS(spark, config);
+
+                // Write DataFrame to S3 as CSV files in a directory
+                String bucketPath = "s3a://" + config.getBucketName() + "/indy_migration_test/" + table.getKeyspace() + "/" + table.getTable() + "/";
+                sqlDF.write()
+                        .format("csv")
+                        .option("header", "true")
+                        .mode("overwrite") // Overwrite if the directory exists
+                        .save(bucketPath);
+                // ========= write data to S3 ===========
+            }
         }
 
         // Stop the Spark session
@@ -107,7 +125,7 @@ public class CassandraMigrationExecutor
     {
         logger.info("Start ....");
 
-        CassandraConfig config = loadConfig();
+        MigrationConfig config = loadConfig();
 
         SparkSession spark = initSessions( config );
 
@@ -117,25 +135,66 @@ public class CassandraMigrationExecutor
 
         for ( CassandraTable table : config.getTables() )
         {
-
-            // Load all CSV files from the directory into a DataFrame
-            Dataset<Row> df = spark.read()
+            Dataset<Row> df = null;
+            if ( !config.getSharedStorage() )
+            {
+                // ========= load data from csv files ===========
+                // Load all CSV files from the directory into a DataFrame
+                df = spark.read()
                     .format("csv")
                     .option("header", "true") // Use first line of CSV file as header
                     .option("inferSchema", "true") // Automatically infer data types
                     .load("/opt/spark/storage/" + table.getId() + "/*");
+                // ========= load data from csv files ===========
+            }
+            else {
+                // ========= load data from S3 ===========
+                // Configure AWS S3 credentials and S3 bucket path
+                configureAWS(spark, config);
 
+                // Read data from S3 into DataFrame
+                String bucketPath = "s3a://" + config.getBucketName() + "/indy_migration_test/" + table.getKeyspace() + "/" + table.getTable() + "/";
+                df = spark.read()
+                        .format("csv")
+                        .option("header", "true")
+                        .option("inferSchema", "true")
+                        .load(bucketPath);
+                // ========= load data from S3 ===========
+                //df.show();
+            }
             // Write the DataFrame to Cassandra
-            df.write()
-                    .format("org.apache.spark.sql.cassandra")
-                    .option("keyspace", table.getKeyspace())
-                    .option("table", table.getTable())
-                    .mode("append")
-                    .save();
+            if ( df != null )
+            {
+                df.write()
+                        .format("org.apache.spark.sql.cassandra")
+                        .option("keyspace", table.getKeyspace())
+                        .option("table", table.getTable())
+                        .mode("append")
+                        .save();
+            }
+            else
+            {
+                logger.warn("No data.");
+            }
         }
 
         // Stop the Spark session
         spark.stop();
+    }
+
+
+    private void configureAWS(SparkSession spark, MigrationConfig config)
+    {
+        // Configure AWS S3 credentials and S3 bucket path
+        String accessKey = config.getAwsAccessKeyID();
+        String secretKey = config.getAwsSecretAccessKey();
+        String region = config.getBucketRegion();
+
+        // Set AWS S3 credentials and region in Spark session
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.access.key", accessKey);
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.secret.key", secretKey);
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.endpoint", "s3." + region + ".amazonaws.com");
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider");
     }
 
 }
