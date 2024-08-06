@@ -29,13 +29,13 @@ public class CassandraMigrationExecutor
         return config;
     }
 
-    private SparkSession initSessions( MigrationConfig config ) throws Exception
+    private SparkSession initSessions( MigrationConfig config, String appName ) throws Exception
     {
         SparkSession spark = null;
         try
         {
             spark = SparkSession.builder()
-                    .appName("CassandraMigration-v1.0")
+                    .appName(appName)
                     .master("spark://spark-master:7077")
                     .config("spark.cassandra.connection.host", config.getHost())
                     .config("spark.cassandra.connection.port", config.getPort()) // Default port, adjust if necessary
@@ -45,7 +45,7 @@ public class CassandraMigrationExecutor
                     .config("spark.cassandra.input.consistency.level", "QUORUM")
                     .config("spark.driver.memory", "1g") // Adjust based on your needs
                     .config("spark.executor.memory", "6g") // Adjust based on your needs
-                    .config("spark.executor.cores", "3") // Adjust based on your needs
+                    .config("spark.executor.cores", "4") // Adjust based on your needs
                     .config("spark.driver.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.executor.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.authenticate", "false")
@@ -69,7 +69,7 @@ public class CassandraMigrationExecutor
 
         MigrationConfig config = loadConfig();
 
-        SparkSession spark = initSessions( config );
+        SparkSession spark = initSessions( config, "ExportCassandraData-v1.0" );
 
         logger.info("Spark session created successfully");
 
@@ -145,7 +145,7 @@ public class CassandraMigrationExecutor
 
         MigrationConfig config = loadConfig();
 
-        SparkSession spark = initSessions( config );
+        SparkSession spark = initSessions( config, "ImportCassandraData-v1.0" );
 
         logger.info("Spark session created successfully");
 
@@ -194,6 +194,7 @@ public class CassandraMigrationExecutor
                 }
                 else
                 {
+                    //https://aws.amazon.com/blogs/storage/optimizing-performance-of-apache-spark-workloads-on-amazon-s3/
                     df = spark.read().parquet(bucketPath);
                 }
                 // ========= load data from S3 ===========
@@ -232,6 +233,15 @@ public class CassandraMigrationExecutor
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.secret.key", secretKey);
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.endpoint", "s3." + region + ".amazonaws.com");
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider");
+
+        // Test for large files upload
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.multipart.uploads.enabled", "true");
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.multipart.size", "10485760");
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.block.size", "1048576000");
+
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.threads.max", "16");
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.connection.maximum", "16");
+
     }
 
 }

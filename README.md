@@ -142,7 +142,7 @@ BUCKET_NAME
 You can use the following tool aws cli to check the files in S3, and remove them after migration.
 
 ```
-aws s3 ls s3://<BUCKET_NAME>/indy_migration_test/indystorage/pathmap/
+aws s3 ls --human-readable --summarize s3://<BUCKET_NAME>/indy_migration_test/indystorage/pathmap/
 
 aws s3 rm s3://<BUCKET_NAME>/indy_migration_test/ --recursive
 ```
