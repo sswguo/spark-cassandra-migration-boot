@@ -111,11 +111,15 @@ Another point, we can increase the resources (cpu & mem) to speed up the process
 .config("spark.executor.cores", "4")
 ```
 
-_NOTE_: executor with cores `4` will run the 4 tasks in parallel 
+_NOTE_: executor with cores `4` will run 4 tasks in parallel 
 
 ## File Format
 
-This application supports two file formats, parquet and CSV
+This application supports two file formats, parquet and CSV, ref the [config](config/config.yaml)
+
+```
+fileFormat: parquet
+```
 
 Parquet is designed to be highly efficient for both reading and writing large datasets.
 [link](https://aemreusta.medium.com/parquet-vs-csv-a-comparison-of-file-formats-for-data-storage-with-experiment-bb0a4d7263ed)
@@ -127,6 +131,8 @@ oc rsync stage_pathmap_migration/ <spark-worker POD_NAME>:/opt/spark/storage/ind
 ```
 
 Update the migration app to write mode, and then sync the jar into spark worker, submit the job in worker node as above.
+
+**_NOTE:_** If you migrate the data into a new cassandra cluster, please ref the above to deploy the spark master & worker in the new cluster as well. 
 
 # Shared Storage - AWS S3
 
