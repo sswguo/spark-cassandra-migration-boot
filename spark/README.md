@@ -1,5 +1,10 @@
 # Spark Deployment in Openshift
 
+**NOTE:**  
+
+Here I am still using the same `entrypoint.sh` for both master and worker, which means I need to comment out start-worker.sh
+when building master and comment out spark-master.sh when building worker image.
+
 Master, specifying the master port in environment
 ```
 env:
