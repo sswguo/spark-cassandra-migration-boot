@@ -48,6 +48,7 @@ mvn clean package
 
 Sync the jar into spark worker
 ```
+mkdir app
 cp target/migration-1.0-SNAPSHOT.jar app
 oc rsync app/ <spark-worker POD_NAME>:/tmp/
 ```
