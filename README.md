@@ -44,7 +44,7 @@ Build the migration application, confirm the migration app is in read mode
 ```
 mvn clean package
 ```
-# Running the migration - read
+# Running the migration - read/export
 
 Sync the jar into spark worker
 ```
@@ -108,10 +108,10 @@ Another point, we can increase the resources (cpu & mem) to speed up the process
 - executor resource
 ```
 .config("spark.executor.memory", "6g")
-.config("spark.executor.cores", "3")
+.config("spark.executor.cores", "4")
 ```
 
-_NOTE_: executor with cores `3` will run the 3 tasks in parallel 
+_NOTE_: executor with cores `4` will run the 4 tasks in parallel 
 
 ## File Format
 
@@ -120,7 +120,7 @@ This application supports two file formats, parquet and CSV
 Parquet is designed to be highly efficient for both reading and writing large datasets.
 [link](https://aemreusta.medium.com/parquet-vs-csv-a-comparison-of-file-formats-for-data-storage-with-experiment-bb0a4d7263ed)
 
-# Running the migration - write
+# Running the migration - write/import
 
 ```
 oc rsync stage_pathmap_migration/ <spark-worker POD_NAME>:/opt/spark/storage/indy_pathmap_0729/
