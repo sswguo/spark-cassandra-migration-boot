@@ -127,6 +127,8 @@ Parquet is designed to be highly efficient for both reading and writing large da
 
 # Running the migration - write/import
 
+If there is no shared storage, you need to move the data into the target worker first.
+
 ```
 oc rsync stage_pathmap_migration/ <spark-worker POD_NAME>:/opt/spark/storage/indy_pathmap_0729/
 ```
