@@ -37,11 +37,15 @@ public class CassandraMigrationExecutor
             spark = SparkSession.builder()
                     .appName(appName)
                     .master("spark://spark-master:7077")
+                    //https://github.com/datastax/spark-cassandra-connector/blob/master/doc/reference.md#cassandra-connection-parameters
                     .config("spark.cassandra.connection.host", config.getHost())
                     .config("spark.cassandra.connection.port", config.getPort()) // Default port, adjust if necessary
                     .config("spark.cassandra.auth.username", config.getUser())
                     .config("spark.cassandra.auth.password", config.getPassword())
                     .config("spark.cassandra.output.consistency.level", "QUORUM")
+                    .config("spark.cassandra.output.batch.size.rows", "2000")
+                    .config("spark.cassandra.output.batch.size.bytes", "10485760") // 10M
+                    .config("spark.cassandra.output.concurrent.writes", "50")
                     .config("spark.cassandra.input.consistency.level", "QUORUM")
                     .config("spark.driver.memory", "1g") // Adjust based on your needs
                     .config("spark.executor.memory", "6g") // Adjust based on your needs
@@ -49,6 +53,9 @@ public class CassandraMigrationExecutor
                     .config("spark.driver.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.executor.extraJavaOptions", "--illegal-access=permit")
                     .config("spark.authenticate", "false")
+                    //https://aws.amazon.com/blogs/storage/optimizing-performance-of-apache-spark-workloads-on-amazon-s3/
+                    //.config("spark.hadoop.parquet.read.allocation.size", "134217728") //128M
+                    //.config("spark.sql.files.maxPartitionBytes", "268435456") //256M
                     .getOrCreate();
         }
         catch (Exception e)
@@ -198,8 +205,8 @@ public class CassandraMigrationExecutor
                     df = spark.read().parquet(bucketPath);
                 }
                 // ========= load data from S3 ===========
-                //df.show();
             }
+            //df.show();
             // Write the DataFrame to Cassandra
             if ( df != null )
             {
@@ -237,8 +244,11 @@ public class CassandraMigrationExecutor
         // Test for large files upload
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.multipart.uploads.enabled", "true");
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.multipart.size", "10485760");
-        spark.sparkContext().hadoopConfiguration().set("fs.s3a.block.size", "1048576000");
+        //spark.sparkContext().hadoopConfiguration().set("fs.s3a.block.size", "1048576000");
+        //spark.sparkContext().hadoopConfiguration().set("fs.s3a.multipart.size", "256M");
+        spark.sparkContext().hadoopConfiguration().set("fs.s3a.block.size", "256M");
 
+        // Try larger one to test download, the previous one is 16
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.threads.max", "16");
         spark.sparkContext().hadoopConfiguration().set("fs.s3a.connection.maximum", "16");
 
