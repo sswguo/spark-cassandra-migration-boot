@@ -77,7 +77,7 @@ Submit the job in worker node
 spark-submit \
   --class org.commonjava.migration.App \
   --master spark://spark-master:7077 \
-  /tmp/migration-1.0-SNAPSHOT.jar
+  /tmp/migration-1.0-SNAPSHOT.jar 2>&1 | tee debug.log
 ```
 
 # Optimize 
@@ -149,6 +149,19 @@ BUCKET_NAME
 ```
 
 You can use the following tool aws cli to check the files in S3, and remove them after migration.
+
+Install the aws cli in the cluster.
+```
+oc apply -f aws_cli.yaml
+```
+
+Login into the cli container, exec `aws s3` command with the following ENVs.
+
+```
+export AWS_ACCESS_KEY_ID=<>
+export AWS_SECRET_ACCESS_KEY=<>
+export AWS_DEFAULT_REGION=<>
+```
 
 ```
 aws s3 ls --human-readable --summarize s3://<BUCKET_NAME>/indy_migration_test/indystorage/pathmap/
