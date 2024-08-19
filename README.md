@@ -152,7 +152,7 @@ You can use the following tool aws cli to check the files in S3, and remove them
 
 Install the aws cli in the cluster.
 ```
-oc apply -f aws_cli.yaml
+oc apply -f s3/k8s/aws_cli.yaml
 ```
 _*NOTE:*_ I mount the volume of spark worker here, then I can download the files first before importing.
 
