@@ -33,10 +33,9 @@ spec:
             - name: AWS_REGION
               value: us-east-1
           imagePullPolicy: Always
-          volumes:
+          volumeMounts:
             - name: vol-migration-data
-              persistentVolumeClaim:
-                claimName: vol-migration-data
+              mountPath: /opt/spark/storage
           terminationMessagePolicy: File
           image: 'quay.io/ligangty/nos-aws-cli:latest'
       restartPolicy: Always

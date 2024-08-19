@@ -154,6 +154,20 @@ Install the aws cli in the cluster.
 ```
 oc apply -f aws_cli.yaml
 ```
+_*NOTE:*_ I mount the volume of spark worker here, then I can download the files first before importing.
+
+```
+volumes:
+- name: vol-migration-data
+  persistentVolumeClaim:
+    claimName: vol-migration-data
+```
+
+The cmd to download the files from S3 to local.
+
+```
+aws s3 cp s3://<BUCKET_NAME>/indy_migration_test/indystorage/pathmap/ ./ --recursive
+```
 
 Login into the cli container, exec `aws s3` command with the following ENVs.
 
