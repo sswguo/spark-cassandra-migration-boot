@@ -2,7 +2,6 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: aws-cli
-  namespace: indy-preview
 spec:
   replicas: 1
   selector:
