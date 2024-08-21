@@ -182,3 +182,14 @@ aws s3 ls --human-readable --summarize s3://<BUCKET_NAME>/indy_migration_test/in
 
 aws s3 rm s3://<BUCKET_NAME>/indy_migration_test/ --recursive
 ```
+
+# Write Tuning Parameters
+
+During tests, I found that there is no big issue on reading from Cassandra. And just need to pay attention to the write operation.
+
+```
+.config("spark.cassandra.output.consistency.level", "ONE") // QUORUM
+.config("spark.cassandra.output.batch.size.rows", "500") // 2000 for pathmap
+.config("spark.cassandra.output.batch.size.bytes", "1048576") // 10485760 (10M) for pathmap
+.config("spark.cassandra.output.concurrent.writes", "5") // 50 for pathmap
+```
