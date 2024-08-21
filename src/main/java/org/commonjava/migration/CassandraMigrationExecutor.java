@@ -42,10 +42,11 @@ public class CassandraMigrationExecutor
                     .config("spark.cassandra.connection.port", config.getPort()) // Default port, adjust if necessary
                     .config("spark.cassandra.auth.username", config.getUser())
                     .config("spark.cassandra.auth.password", config.getPassword())
-                    .config("spark.cassandra.output.consistency.level", "QUORUM")
-                    .config("spark.cassandra.output.batch.size.rows", "2000")
-                    .config("spark.cassandra.output.batch.size.bytes", "10485760") // 10M
-                    .config("spark.cassandra.output.concurrent.writes", "50")
+                    .config("spark.cassandra.output.consistency.level", "ONE") // QUORUM
+                    //.config("spark.cassandra.output.batch.grouping.key", "replica_set") // default: Partition
+                    .config("spark.cassandra.output.batch.size.rows", "500") // 2000 for pathmap
+                    .config("spark.cassandra.output.batch.size.bytes", "1048576") // 10485760 (10M) for pathmap
+                    .config("spark.cassandra.output.concurrent.writes", "5") // 50 for pathmap
                     .config("spark.cassandra.input.consistency.level", "QUORUM")
                     .config("spark.driver.memory", "1g") // Adjust based on your needs
                     .config("spark.executor.memory", "6g") // Adjust based on your needs

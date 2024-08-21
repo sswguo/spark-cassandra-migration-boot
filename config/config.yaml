@@ -8,6 +8,11 @@ tables:
     tempView: pathmap
     filter: "creation > '2023-08-08'"
     id: pathmap_dev
+    # Write Tuning Parameters
+    outputConsistencyLevel:
+    outputBatchSizeRows:
+    outputBatchSizeBytes:
+    outputConcurrentWrites:
 sharedStorage: true
 fileFormat: parquet
 awsAccessKeyID:
