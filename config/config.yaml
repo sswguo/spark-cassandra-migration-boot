@@ -9,10 +9,10 @@ tables:
     filter: "creation > '2023-08-08'"
     id: pathmap_dev
     # Write Tuning Parameters
-    outputConsistencyLevel:
-    outputBatchSizeRows:
-    outputBatchSizeBytes:
-    outputConcurrentWrites:
+    outputConsistencyLevel: QUORUM # or ONE
+    outputBatchSizeRows: 500
+    outputBatchSizeBytes: 1048576
+    outputConcurrentWrites: 5
 sharedStorage: true
 fileFormat: parquet
 awsAccessKeyID:

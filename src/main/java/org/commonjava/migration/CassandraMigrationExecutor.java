@@ -29,7 +29,7 @@ public class CassandraMigrationExecutor
         return config;
     }
 
-    private SparkSession initSessions( MigrationConfig config, String appName ) throws Exception
+    private SparkSession initSessions( MigrationConfig config, CassandraTable table, String appName ) throws Exception
     {
         SparkSession spark = null;
         try
@@ -42,11 +42,11 @@ public class CassandraMigrationExecutor
                     .config("spark.cassandra.connection.port", config.getPort()) // Default port, adjust if necessary
                     .config("spark.cassandra.auth.username", config.getUser())
                     .config("spark.cassandra.auth.password", config.getPassword())
-                    .config("spark.cassandra.output.consistency.level", "ONE") // QUORUM
-                    //.config("spark.cassandra.output.batch.grouping.key", "replica_set") // default: Partition
-                    .config("spark.cassandra.output.batch.size.rows", "500") // 2000 for pathmap
-                    .config("spark.cassandra.output.batch.size.bytes", "1048576") // 10485760 (10M) for pathmap
-                    .config("spark.cassandra.output.concurrent.writes", "5") // 50 for pathmap
+                    // Write Tunning Parameters
+                    .config("spark.cassandra.output.consistency.level", table == null ? "QUORUM" : table.getOutputConsistencyLevel()) // QUORUM
+                    .config("spark.cassandra.output.batch.size.rows", table == null ?  "2000" : table.getOutputBatchSizeRows()) // 2000 for pathmap and 500 for records2
+                    .config("spark.cassandra.output.batch.size.bytes", table == null ? "10485760" : table.getOutputBatchSizeBytes()) // 10485760 (10M) for pathmap and 1048576 for records2
+                    .config("spark.cassandra.output.concurrent.writes", table == null ? "50" : table.getOutputConcurrentWrites()) // 50 for pathmap and 5 for records2
                     .config("spark.cassandra.input.consistency.level", "QUORUM")
                     .config("spark.driver.memory", "1g") // Adjust based on your needs
                     .config("spark.executor.memory", "6g") // Adjust based on your needs
@@ -77,7 +77,7 @@ public class CassandraMigrationExecutor
 
         MigrationConfig config = loadConfig();
 
-        SparkSession spark = initSessions( config, "ExportCassandraData-v1.0" );
+        SparkSession spark = initSessions( config, null,"ExportCassandraData-v1.0" );
 
         logger.info("Spark session created successfully");
 
@@ -153,14 +153,15 @@ public class CassandraMigrationExecutor
 
         MigrationConfig config = loadConfig();
 
-        SparkSession spark = initSessions( config, "ImportCassandraData-v1.0" );
-
-        logger.info("Spark session created successfully");
-
-        Thread.sleep(30000);
-
         for ( CassandraTable table : config.getTables() )
         {
+            // Since it needs to set the config for different table, let's start the spark session for each table.
+            SparkSession spark = initSessions( config, table, "ImportCassandraData-v1.0" );
+
+            logger.info("Spark session created successfully");
+
+            Thread.sleep(30000);
+
             Dataset<Row> df = null;
             if ( !config.getSharedStorage() )
             {
@@ -222,10 +223,11 @@ public class CassandraMigrationExecutor
             {
                 logger.warn("No data.");
             }
+
+            // Stop the Spark session
+            spark.stop();
         }
 
-        // Stop the Spark session
-        spark.stop();
     }
 
 
