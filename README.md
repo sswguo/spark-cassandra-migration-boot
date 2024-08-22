@@ -194,3 +194,16 @@ Try to decrease the value for each if you have smaller resources for your Cassan
 .config("spark.cassandra.output.batch.size.bytes", "1048576") // 10485760 (10M) for pathmap
 .config("spark.cassandra.output.concurrent.writes", "5") // 50 for pathmap
 ```
+
+For example, the following is the config for folo.records.
+```
+- keyspace: folo
+  table: records2
+  tempView: records2
+  id: records2
+  # Write Tuning Parameters
+  outputConsistencyLevel: ONE
+  outputBatchSizeRows: 500
+  outputBatchSizeBytes: 524288
+  outputConcurrentWrites: 5
+```
