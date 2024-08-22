@@ -79,7 +79,7 @@ public class CassandraMigrationExecutor
 
         SparkSession spark = initSessions( config, null,"ExportCassandraData-v1.0" );
 
-        logger.info("Spark session created successfully");
+        logger.info(">>> Spark session created successfully");
 
         Thread.sleep(30000);
 
@@ -158,7 +158,7 @@ public class CassandraMigrationExecutor
             // Since it needs to set the config for different table, let's start the spark session for each table.
             SparkSession spark = initSessions( config, table, "ImportCassandraData-v1.0" );
 
-            logger.info("Spark session created successfully");
+            logger.info(">>> Spark session on table #{} created successfully", table.getTable());
 
             Thread.sleep(30000);
 
