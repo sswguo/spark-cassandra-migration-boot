@@ -86,4 +86,19 @@ public class CassandraTable
     public void setOutputConcurrentWrites(String outputConcurrentWrites) {
         this.outputConcurrentWrites = outputConcurrentWrites;
     }
+
+    @Override
+    public String toString() {
+        return "CassandraTable{" +
+                "keyspace='" + keyspace + '\'' +
+                ", table='" + table + '\'' +
+                ", tempView='" + tempView + '\'' +
+                ", filter='" + filter + '\'' +
+                ", id='" + id + '\'' +
+                ", outputConsistencyLevel='" + outputConsistencyLevel + '\'' +
+                ", outputBatchSizeRows='" + outputBatchSizeRows + '\'' +
+                ", outputBatchSizeBytes='" + outputBatchSizeBytes + '\'' +
+                ", outputConcurrentWrites='" + outputConcurrentWrites + '\'' +
+                '}';
+    }
 }
