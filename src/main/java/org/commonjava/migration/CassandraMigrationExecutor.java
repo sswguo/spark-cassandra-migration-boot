@@ -42,6 +42,7 @@ public class CassandraMigrationExecutor
                     .config("spark.cassandra.connection.port", config.getPort()) // Default port, adjust if necessary
                     .config("spark.cassandra.auth.username", config.getUser())
                     .config("spark.cassandra.auth.password", config.getPassword())
+                    .config("spark.cassandra.connection.timeoutMS", "30000")
                     // Write Tunning Parameters
                     .config("spark.cassandra.output.consistency.level", table == null ? "QUORUM" : table.getOutputConsistencyLevel()) // QUORUM
                     .config("spark.cassandra.output.batch.size.rows", table == null ?  "2000" : table.getOutputBatchSizeRows()) // 2000 for pathmap and 500 for records2

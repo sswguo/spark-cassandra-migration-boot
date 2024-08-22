@@ -186,6 +186,7 @@ aws s3 rm s3://<BUCKET_NAME>/indy_migration_test/ --recursive
 # Write Tuning Parameters
 
 During tests, I found that there is no big issue on reading from Cassandra. And just need to pay attention to the write operation.
+Try to decrease the value for each if you have smaller resources for your Cassandra. 
 
 ```
 .config("spark.cassandra.output.consistency.level", "ONE") // QUORUM
